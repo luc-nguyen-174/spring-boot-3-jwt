@@ -15,7 +15,7 @@ import java.util.Optional;
 public class UserInfoService implements UserDetailsService {
 
     @Autowired
-    private UserInfoRepository repository;
+    private UserInfoRepository userInfoRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -23,7 +23,7 @@ public class UserInfoService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Optional<UserInfo> userDetail = repository.findByName(username);
+        Optional<UserInfo> userDetail = userInfoRepository.findByUsername(username);
 
         // Converting userDetail to UserDetails
         return userDetail.map(UserInfoDetails::new)
@@ -31,8 +31,24 @@ public class UserInfoService implements UserDetailsService {
     }
 
     public String addUser(UserInfo userInfo) {
+        if (userInfoRepository.findByUsername(userInfo.getUsername()).isPresent()) {
+            return "User Already Exists";
+        } else if (userInfo.getUsername().isEmpty() || userInfo.getPassword().isEmpty()) {
+            return "Username or Password cannot be empty";
+        } else if (userInfo.getPassword().length() < 8) {
+            return "Password must be at least 8 characters";
+        } else if (userInfo.getUsername().length() < 4) {
+            return "Username must be at least 4 characters";
+        } else if (userInfo.getUsername().length() > 20) {
+            return "Username must be less than 20 characters";
+        } else if (userInfo.getPassword().length() > 20) {
+            return "Password must be less than 20 characters";
+        } else if (userInfo.getUsername().contains(" ") || userInfo.getPassword().contains(" ")) {
+            return "Username or Password cannot contain spaces";
+        }
+        userInfo.setRoles("ROLE_USER");
         userInfo.setPassword(encoder.encode(userInfo.getPassword()));
-        repository.save(userInfo);
+        userInfoRepository.save(userInfo);
         return "User Added Successfully";
     }
 
