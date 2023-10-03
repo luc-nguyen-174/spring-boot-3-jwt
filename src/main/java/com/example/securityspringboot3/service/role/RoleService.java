@@ -5,6 +5,8 @@ import com.example.securityspringboot3.repository.IRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class RoleService implements IRoleService{
     @Autowired
@@ -13,5 +15,10 @@ public class RoleService implements IRoleService{
     @Override
     public Role findByName(String name) {
         return roleRepository.findByName(name);
+    }
+
+    @Override
+    public Optional<Role> findRoleById(Long id) {
+        return roleRepository.findRoleById(id);
     }
 }
