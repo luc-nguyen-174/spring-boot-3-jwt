@@ -1,5 +1,6 @@
 package com.example.securityspringboot3.controller;
 
+import com.example.securityspringboot3.dto.SignUpDTO;
 import com.example.securityspringboot3.entity.AuthRequest;
 import com.example.securityspringboot3.entity.UserInfo;
 import com.example.securityspringboot3.service.jwt.JwtService;
@@ -12,9 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
   
-@SuppressWarnings("ALL")
 @RestController
-@RequestMapping("/auth")
+@CrossOrigin("*")
+@RequestMapping("/api/auth")
 public class UserController {
   
     @Autowired
@@ -33,8 +34,8 @@ public class UserController {
 
     /*----------------------  add new user  ---------------------*/
     @PostMapping("/addNewUser")
-    public String addNewUser(@RequestBody UserInfo userInfo) {
-        return service.addUser(userInfo);
+    public String addNewUser(@RequestBody SignUpDTO signUpDTO) {
+        return service.addUser(signUpDTO);
     }
   
     @GetMapping("/user/userProfile")

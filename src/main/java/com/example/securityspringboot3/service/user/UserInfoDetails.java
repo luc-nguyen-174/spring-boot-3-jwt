@@ -8,20 +8,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+// This class is used to convert UserInfo to UserDetails
 public class UserInfoDetails implements UserDetails {
 
-    private String name;
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final String name;
+    private final String password;
+    private final Set<GrantedAuthority> authorities;
+
+    // Constructor to convert UserInfo to UserDetails
+    // This constructor is used in UserInfoService.java
 
     public UserInfoDetails(UserInfo userInfo) {
-        name = userInfo.getName();
+        name = userInfo.getUsername();
         password = userInfo.getPassword();
-        authorities = Arrays.stream(userInfo.getRoles().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        authorities = userInfo.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
     }
 
     @Override

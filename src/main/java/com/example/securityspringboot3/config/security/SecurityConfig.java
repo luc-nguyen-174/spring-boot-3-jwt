@@ -51,9 +51,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((AbstractHttpConfigurer::disable))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
-                        .requestMatchers("/auth/user/**").authenticated()
-                        .requestMatchers("/auth/admin/**").authenticated())
+                        .requestMatchers(
+                                "/api/auth/welcome",
+                                "/api/auth/addNewUser",
+                                "/api/auth/generateToken",
+                                "/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/auth/user/**").authenticated()
+                        .requestMatchers("/api/auth/admin/**").authenticated())
                 .sessionManagement(sessionManager -> sessionManager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
