@@ -1,0 +1,11 @@
+package com.example.securityspringboot3.service.role;
+
+import com.example.securityspringboot3.entity.Role;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public interface IRoleService {
+    Role findByName(String name);
+}

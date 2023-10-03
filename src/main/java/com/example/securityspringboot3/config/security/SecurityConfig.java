@@ -52,7 +52,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((AbstractHttpConfigurer::disable))
                 .authorizeHttpRequests(requestMatcherRegistry -> requestMatcherRegistry
-                        .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
+                        .requestMatchers(
+                                "/auth/welcome",
+                                "/auth/addNewUser",
+                                "/auth/generateToken",
+                                "/swagger-ui/index.html").permitAll()
                         .requestMatchers("/auth/user/**").authenticated()
                         .requestMatchers("/auth/admin/**").authenticated())
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer

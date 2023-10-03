@@ -1,9 +1,11 @@
 package com.example.securityspringboot3.controller;
 
+import com.example.securityspringboot3.dto.UserDTO;
 import com.example.securityspringboot3.entity.AuthRequest;
 import com.example.securityspringboot3.entity.UserInfo;
 import com.example.securityspringboot3.service.jwt.JwtService;
 import com.example.securityspringboot3.service.user.UserInfoService;
+import com.fasterxml.jackson.databind.DatabindException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,8 +35,8 @@ public class UserController {
 
     /*----------------------  add new user  ---------------------*/
     @PostMapping("/addNewUser")
-    public String addNewUser(@RequestBody UserInfo userInfo) {
-        return service.addUser(userInfo);
+    public String addNewUser(@RequestBody UserDTO userDTO) {
+        return service.addUser(userDTO);
     }
   
     @GetMapping("/user/userProfile")
