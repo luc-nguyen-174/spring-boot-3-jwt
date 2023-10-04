@@ -70,6 +70,11 @@ public class UserController {
     }
 
 
+    @GetMapping("/admin/get-all-user")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public Iterable<UserInfo> getAllUser() {
+        return service.findAll();
+    }
     /*----------------------gentoken---------------------*/
     @PostMapping("/generateToken")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {

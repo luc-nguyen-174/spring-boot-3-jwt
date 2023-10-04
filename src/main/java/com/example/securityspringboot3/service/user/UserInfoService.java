@@ -7,6 +7,8 @@ import com.example.securityspringboot3.repository.IRoleRepository;
 import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.role.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +20,9 @@ import java.util.Set;
 
 @Service
 public class UserInfoService implements UserDetailsService, IUserInfoService {
+
+    @Autowired
+    private IUserInfoService userInfoService;
 
     @Autowired
     private UserInfoRepository userInfoRepository;
@@ -38,7 +43,17 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
     public String addUser(UserDTO userDTO) {
         if (userInfoRepository.countByUsername(userDTO.getUsername()) != 0) {
-            return userInfoRepository.findByUsernameAndRolesName(userDTO.getUsername(), userDTO.getRoles()).isPresent() ? "User already exists" : addUserSuccess(userDTO);
+            if (userInfoRepository.findByUsernameAndRolesName(userDTO.getUsername(), userDTO.getRoles()).isPresent()) {
+                return "User already exists";
+            } else {
+                //chinh sua lai code de khi dang ki, neu user da ton tai thi se them role moi cho user do
+                UserInfo userInfo = userInfoRepository.findByUsername(userDTO.getUsername()).get();
+                Role role = roleService.findByName(userDTO.getRoles());
+                //them role moi cho user ma khong lu user vao db
+
+
+                return "User Added Successfully";
+            }
         } else if (userDTO.getUsername().isEmpty() || userDTO.getPassword().isEmpty()) {
             return "Username or Password cannot be empty";
         } else if (userDTO.getPassword().length() < 8) {
@@ -52,10 +67,6 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
         } else if (userDTO.getUsername().contains(" ") || userDTO.getPassword().contains(" ")) {
             return "Username or Password cannot contain spaces";
         }
-        return addUserSuccess(userDTO);
-    }
-
-    private String addUserSuccess(UserDTO userDTO) {
         UserInfo userInfo = userDTO.toUserInfo();
         String roles = userDTO.getRoles();
         userInfo.setEmail(userDTO.getEmail());
@@ -67,7 +78,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
     @Override
     public Iterable<UserInfo> findAll() {
-        return userInfoRepository.findAll();
+        return userInfoService.findAll();
     }
 
     @Override
@@ -84,5 +95,15 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     @Override
     public void remove(Long id) {
         userInfoRepository.deleteById(id);
+    }
+
+    @Override
+    public UserInfo saveUserFromDTO(UserDTO userDTO) {
+        UserInfo userInfo = userDTO.toUserInfo();
+        String roles = userDTO.getRoles();
+        userInfo.setEmail(userDTO.getEmail());
+        userInfo.setRoles(Set.of(roleService.findByName(roles)));
+        userInfo.setPassword(encoder.encode(userInfo.getPassword()));
+        return userInfoRepository.save(userInfo);
     }
 }
