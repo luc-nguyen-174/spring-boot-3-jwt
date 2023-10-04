@@ -15,10 +15,10 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class OpenAPIConfig {
 
-    @Value("${dev-url}")
+    @Value("${bezkoder.openapi.dev-url}")
     private String devUrl;
 
-    @Value("${prod-url}")
+    @Value("${bezkoder.openapi.prod-url}")
     private String prodUrl;
 
     @Bean
@@ -32,18 +32,17 @@ public class OpenAPIConfig {
         prodServer.setDescription("Server URL in Production environment");
 
         Contact contact = new Contact();
-        contact.setEmail("bezkoder@gmail.com");
-        contact.setName("BezKoder");
-        contact.setUrl("https://www.bezkoder.com");
+        contact.setEmail("email@email.com");
+        contact.setName("NguyenLuc");
+        contact.setUrl("https://localhost:8080");
 
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
-        Info info = new Info()
-                .title("Tutorial Management API")
-                .version("1.0")
-                .contact(contact)
-                .description("This API exposes endpoints to manage tutorials.").termsOfService("https://www.bezkoder.com/terms")
-                .license(mitLicense);
+        Info info = new Info().title("Spring Boot 3 Security")
+                .description("Example project for Spring Boot 3 Security")
+                .version("1.0.0")
+                .license(mitLicense)
+                .contact(contact);
 
         return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
     }

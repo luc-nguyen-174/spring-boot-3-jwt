@@ -1,11 +1,14 @@
 package com.example.securityspringboot3.service.role;
 
 import com.example.securityspringboot3.entity.Role;
-import com.example.securityspringboot3.service.IServiceGeneral;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.Optional;
 
-public interface IRoleService extends IServiceGeneral<Role> {
-    Set<Role> getRoleByName(Set<String> name);
+@Service
+public interface IRoleService {
+    Role findByName(String name);
 
+    Optional<Role> findRoleById(@NotNull Long id);
 }
