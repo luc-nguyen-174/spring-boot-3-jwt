@@ -37,8 +37,8 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     }
 
     public String addUser(UserDTO userDTO) {
-        if (userInfoRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            return userInfoRepository.existsUserInfoByUsernameAndRoles(userDTO.getUsername(), userDTO.getRoles()) != 0 ? "User already exists" : addUserSuccess(userDTO);
+        if (userInfoRepository.countByUsername(userDTO.getUsername()) != 0) {
+            return userInfoRepository.findByUsernameAndRolesName(userDTO.getUsername(), userDTO.getRoles()).isPresent() ? "User already exists" : addUserSuccess(userDTO);
         } else if (userDTO.getUsername().isEmpty() || userDTO.getPassword().isEmpty()) {
             return "Username or Password cannot be empty";
         } else if (userDTO.getPassword().length() < 8) {
@@ -75,6 +75,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
         return userInfoRepository.findById(id);
     }
 
+    //not used
     @Override
     public UserInfo save(UserInfo userInfo) {
         return null;

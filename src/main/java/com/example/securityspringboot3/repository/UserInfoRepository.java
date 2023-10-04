@@ -11,8 +11,12 @@ import java.util.Optional;
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     Optional<UserInfo> findByUsername(String username);
 
-    @Query(
-            value = "select exists( select * from userinfo ui join security.user_role ur on ui.id = ur.user_id where ui.username = :username and ur.role_id = (select id from role where name = :role)) as result",
+    @Query(value = " select * from userinfo ui join security.user_role ur on ui.id = ur.user_id " +
+                    "where ui.username = :username " +
+                    "and ur.role_id = (select id from role where name = :role)",
             nativeQuery = true)
-    int existsUserInfoByUsernameAndRoles(String username, String role);
+    Optional<UserInfo> findByUsernameAndRolesName(String username, String role);
+
+    @Query(value = "select count(u.id) from security.userinfo u where u.username = :username", nativeQuery = true)
+    int countByUsername(String username);
 }
