@@ -56,7 +56,8 @@ public class SecurityConfig {
                                 "/auth/welcome",
                                 "/auth/addNewUser",
                                 "/auth/generateToken",
-                                "/swagger-ui/index.html").permitAll()
+                                "/swagger-ui/**",
+                                "/v3/**").permitAll()
                         .requestMatchers("/auth/user/**").authenticated()
                         .requestMatchers("/auth/admin/**").authenticated())
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
