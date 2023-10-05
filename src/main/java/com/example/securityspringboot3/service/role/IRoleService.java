@@ -9,4 +9,5 @@ import java.util.Optional;
 @Service
 public interface IRoleService {
     Role findByName(String name);
+
 }

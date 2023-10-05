@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.Set;
 
@@ -11,6 +13,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "user_info")
 public class UserInfo {
 
     @Id
@@ -19,17 +22,18 @@ public class UserInfo {
     private String username;
     private String email;
     private String password;
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    public UserInfo(String username, String password, String role, String email) {
+    public UserInfo(String username, String password, String email, String roles) {
         this.username = username;
-        this.email = email;
         this.password = password;
-        this.roles = Set.of(new Role(role));
+        this.email = email;
+        this.roles = Set.of(new Role(roles));
     }
 }

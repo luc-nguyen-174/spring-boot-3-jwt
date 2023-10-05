@@ -16,4 +16,5 @@ public class RoleService implements IRoleService{
     public Role findByName(String name) {
         return roleRepository.findByName(name);
     }
+
 }

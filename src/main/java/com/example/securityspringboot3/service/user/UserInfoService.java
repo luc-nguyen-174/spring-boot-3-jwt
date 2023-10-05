@@ -7,6 +7,7 @@ import com.example.securityspringboot3.repository.IRoleRepository;
 import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.role.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,11 +49,16 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
             } else {
                 //chinh sua lai code de khi dang ki, neu user da ton tai thi se them role moi cho user do
                 UserInfo userInfo = userInfoRepository.findByUsername(userDTO.getUsername()).get();
-                Role role = roleService.findByName(userDTO.getRoles());
-                //them role moi cho user ma khong lu user vao db
-
-
-                return "User Added Successfully";
+                //new role
+                String roles = userDTO.getRoles();
+                //get currentRole
+                Set<Role> currentRole = userInfo.getRoles();
+                //add roles and currentRole to new Set
+                currentRole.add(roleService.findByName(roles));
+                // add new role to user
+                userInfo.setRoles(currentRole);
+                userInfoRepository.save(userInfo);
+                return "New role added to user";
             }
         } else if (userDTO.getUsername().isEmpty() || userDTO.getPassword().isEmpty()) {
             return "Username or Password cannot be empty";
@@ -78,7 +84,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
     @Override
     public Iterable<UserInfo> findAll() {
-        return userInfoService.findAll();
+        return userInfoRepository.findAll();
     }
 
     @Override
@@ -89,7 +95,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     //not used
     @Override
     public UserInfo save(UserInfo userInfo) {
-        return null;
+        return userInfoRepository.save(userInfo);
     }
 
     @Override
@@ -98,12 +104,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     }
 
     @Override
-    public UserInfo saveUserFromDTO(UserDTO userDTO) {
-        UserInfo userInfo = userDTO.toUserInfo();
-        String roles = userDTO.getRoles();
-        userInfo.setEmail(userDTO.getEmail());
-        userInfo.setRoles(Set.of(roleService.findByName(roles)));
-        userInfo.setPassword(encoder.encode(userInfo.getPassword()));
-        return userInfoRepository.save(userInfo);
+    public void addRoleToUser(Long userId, Long roleId) {
+        userInfoRepository.addRoleToUser(userId, roleId);
     }
 }

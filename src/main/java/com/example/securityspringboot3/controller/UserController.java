@@ -57,21 +57,18 @@ public class UserController {
 
     /*----------------------  user profile  ---------------------*/
     @GetMapping("/user/userProfile")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
     public String userProfile() {
         return "Welcome to User Profile";
     }
 
     /*----------------------  admin profile  ---------------------*/
     @GetMapping("/admin/adminProfile")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public String adminProfile() {
         return "Welcome to Admin Profile";
     }
 
 
-    @GetMapping("/admin/get-all-user")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/get-all-user")
     public Iterable<UserInfo> getAllUser() {
         return service.findAll();
     }
