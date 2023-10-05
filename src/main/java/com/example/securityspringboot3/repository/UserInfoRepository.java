@@ -1,11 +1,13 @@
 package com.example.securityspringboot3.repository;
 
+import com.example.securityspringboot3.entity.Role;
 import com.example.securityspringboot3.entity.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
@@ -23,6 +25,5 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     @Query(value = "insert into user_role (user_id, role_id) values (:userId, :roleId)",
             nativeQuery = true)
     void addRoleToUser(Long userId, Long roleId);
-
 
 }

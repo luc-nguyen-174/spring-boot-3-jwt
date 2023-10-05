@@ -3,13 +3,9 @@ package com.example.securityspringboot3.service.user;
 import com.example.securityspringboot3.dto.UserDTO;
 import com.example.securityspringboot3.entity.Role;
 import com.example.securityspringboot3.entity.UserInfo;
-import com.example.securityspringboot3.repository.IRoleRepository;
 import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.role.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,12 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserInfoService implements UserDetailsService, IUserInfoService {
-
-    @Autowired
-    private IUserInfoService userInfoService;
 
     @Autowired
     private UserInfoRepository userInfoRepository;
@@ -38,26 +32,31 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserInfo> userDetail = userInfoRepository.findByUsername(username);
         // Converting userDetail to UserDetails
-        return userDetail.map(UserInfoDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+        return userDetail.map(UserInfoDetails::build).orElse(null);
     }
 
     public String addUser(UserDTO userDTO) {
         if (userInfoRepository.countByUsername(userDTO.getUsername()) != 0) {
-            if (userInfoRepository.findByUsernameAndRolesName(userDTO.getUsername(), userDTO.getRoles()).isPresent()) {
+            Optional<UserInfo> userInfoOptional = userInfoRepository.findByUsername(userDTO.getUsername());
+            if (userInfoOptional.isPresent()
+                    && userInfoOptional.get()
+                    .getRoles()
+                    .stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toSet())
+                    .containsAll(userDTO.getRoles())) {
                 return "User already exists";
             } else {
                 //chinh sua lai code de khi dang ki, neu user da ton tai thi se them role moi cho user do
-                UserInfo userInfo = userInfoRepository.findByUsername(userDTO.getUsername()).get();
                 //new role
-                String roles = userDTO.getRoles();
+                Set<String> roles = userDTO.getRoles();
                 //get currentRole
-                Set<Role> currentRole = userInfo.getRoles();
+                Set<Role> currentRole = userInfoOptional.get().getRoles();
                 //add roles and currentRole to new Set
-                currentRole.add(roleService.findByName(roles));
+                currentRole.addAll(roles.stream().map(roleService::findByName).collect(Collectors.toSet()));
                 // add new role to user
-                userInfo.setRoles(currentRole);
-                userInfoRepository.save(userInfo);
+                userInfoOptional.get().setRoles(currentRole);
+                save(userInfoOptional.get());
                 return "New role added to user";
             }
         } else if (userDTO.getUsername().isEmpty() || userDTO.getPassword().isEmpty()) {
@@ -74,11 +73,13 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
             return "Username or Password cannot contain spaces";
         }
         UserInfo userInfo = userDTO.toUserInfo();
-        String roles = userDTO.getRoles();
+        Set<String> roles = userDTO.getRoles();
+        Set<Role> roleSet = roleService.getRoleByName(roles);
+
+        userInfo.setRoles(roleSet);
         userInfo.setEmail(userDTO.getEmail());
-        userInfo.setRoles(Set.of(roleService.findByName(roles)));
         userInfo.setPassword(encoder.encode(userInfo.getPassword()));
-        userInfoRepository.save(userInfo);
+        save(userInfo);
         return "User Added Successfully";
     }
 

@@ -2,7 +2,7 @@ package com.example.securityspringboot3.service;
 
 import java.util.Optional;
 
-public interface IServiceGeneral<T> {
+public interface IGenericService<T> {
     Iterable<T> findAll();
 
     Optional<T> findById(Long id);
