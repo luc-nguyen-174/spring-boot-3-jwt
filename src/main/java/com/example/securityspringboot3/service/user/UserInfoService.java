@@ -8,6 +8,7 @@ import com.example.securityspringboot3.repository.ConfirmationTokenRepository;
 import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.email.EmailService;
 import com.example.securityspringboot3.service.role.IRoleService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,6 +49,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found " + name));
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public String addUser(UserDTO userDTO) {
         if (userInfoRepository.countByUsername(userDTO.getName()) != 0) {
             Optional<UserInfo> userInfoOptional = userInfoRepository.findByName(userDTO.getName());

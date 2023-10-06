@@ -85,7 +85,7 @@ public class UserController {
 
 
     @GetMapping("/get-all-user")
-//    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Iterable<UserInfo>> getAllUser() {
         Iterable<UserInfo> userInfos = userInfoService.findAll();
         return new ResponseEntity<>(userInfos, HttpStatus.OK);
