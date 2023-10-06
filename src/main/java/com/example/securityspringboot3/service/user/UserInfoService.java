@@ -96,8 +96,11 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     }
 
     //not used
+    //save user by role object
+    //not use dto
     @Override
     public UserInfo save(UserInfo userInfo) {
+        userInfo.setPassword(encoder.encode(userInfo.getPassword()));
         return userInfoRepository.save(userInfo);
     }
 

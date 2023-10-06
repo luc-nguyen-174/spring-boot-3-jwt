@@ -21,8 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "Tutorial", description = "Tutorial management APIs")
 @RestController
 @RequestMapping("/auth")
@@ -37,6 +35,7 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    /*----------------------Swagger and test api---------------------*/
     @Operation(
             summary = "Retrieve a Tutorial by Id",
             description = "Get a Tutorial object by specifying its id. The response is Tutorial object with id, title, description and published status.",
@@ -46,33 +45,41 @@ public class UserController {
             @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema())}),
             @ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
 
+    //non-secure endpoint
     @GetMapping("/welcome")
     public String welcome() {
         return "Welcome this endpoint is not secure";
     }
 
     /*----------------------  add new user  ---------------------*/
-    @PostMapping("/addNewUser")
+    @PostMapping({"/", ""})
     public String addNewUser(@RequestBody UserDTO userDTO) {
         return userInfoService.addUser(userDTO);
     }
 
+//    @PostMapping("/addNewUser")
+//    public ResponseEntity<UserInfo> addNewUser(@RequestBody UserInfo user) {
+//        UserInfo userInfo = userInfoService.save(user);
+//        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+//    }
+
     /*----------------------  user profile  ---------------------*/
-    @GetMapping("/user/userProfile")
+    @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public String userProfile() {
         return "Welcome to User Profile";
     }
 
     /*----------------------  admin profile  ---------------------*/
-    @GetMapping("/admin/adminProfile")
+    @GetMapping("/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public String adminProfile() {
         return "Welcome to Admin Profile";
     }
 
 
-    @GetMapping("/get-all-user")
+    @GetMapping("/admin/get-all-user")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Iterable<UserInfo>> getAllUser() {
         Iterable<UserInfo> userInfos = userInfoService.findAll();
         return new ResponseEntity<>(userInfos, HttpStatus.OK);
