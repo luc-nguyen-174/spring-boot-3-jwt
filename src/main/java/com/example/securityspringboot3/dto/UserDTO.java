@@ -6,30 +6,30 @@ import lombok.Getter;
 import java.util.Set;
 
 public class UserDTO {
-    private String username;
+    private String name;
     private String password;
     private String email;
     private Set<String> roles;
 
     public UserInfo toUserInfo() {
-        return new UserInfo(username, password, email);
+        return new UserInfo(name, password, email);
     }
     public UserDTO() {
     }
 
-    public UserDTO(String username, String email, String password, Set<String> roles) {
-        this.username = username;
+    public UserDTO(String name, String email, String password, Set<String> roles) {
+        this.name = name;
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {

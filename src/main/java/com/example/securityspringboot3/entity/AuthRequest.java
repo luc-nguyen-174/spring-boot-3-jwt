@@ -1,10 +1,9 @@
 package com.example.securityspringboot3.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-  
-@Data
+import lombok.*;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthRequest {

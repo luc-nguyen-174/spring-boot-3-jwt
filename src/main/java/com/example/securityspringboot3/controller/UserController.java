@@ -51,8 +51,14 @@ public class UserController {
         return "Welcome this endpoint is not secure";
     }
 
+    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String confirmationToken) {
+        return userInfoService.confirmEmail(confirmationToken);
+    }
+
+
     /*----------------------  add new user  ---------------------*/
-    @PostMapping({"/", ""})
+    @PostMapping({"/"})
     public String addNewUser(@RequestBody UserDTO userDTO) {
         return userInfoService.addUser(userDTO);
     }
@@ -78,8 +84,8 @@ public class UserController {
     }
 
 
-    @GetMapping("/admin/get-all-user")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/get-all-user")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Iterable<UserInfo>> getAllUser() {
         Iterable<UserInfo> userInfos = userInfoService.findAll();
         return new ResponseEntity<>(userInfos, HttpStatus.OK);
@@ -88,8 +94,8 @@ public class UserController {
     /*----------------------gen token---------------------*/
     @PostMapping("/generateToken")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(authRequest.getUsername());
         } else {

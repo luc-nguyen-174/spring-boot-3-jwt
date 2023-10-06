@@ -53,8 +53,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requestMatcherRegistry -> requestMatcherRegistry
                         .requestMatchers(
                                 "/auth/welcome",
-                                "/auth/addNewUser",
-                                "/auth/generateToken",
+                                "/auth/",
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/confirm-account/**",
+                                "/auth/generateToken/**",
                                 "/swagger-ui/**",
                                 "/v3/**",
                                 "/auth/get-all-user").permitAll()
