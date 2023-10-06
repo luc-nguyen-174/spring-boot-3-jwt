@@ -5,13 +5,14 @@ import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @Table(name = "user_info")
-public class UserInfo {
+public class UserInfo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

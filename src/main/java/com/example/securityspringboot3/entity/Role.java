@@ -6,18 +6,16 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Role {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    private Set<UserInfo> users;
 
     public Long getId() {
         return id;
@@ -35,21 +33,12 @@ public class Role {
         this.name = name;
     }
 
-    public Set<UserInfo> getUsers() {
-        return users;
+    public Role() {
     }
 
-    public void setUsers(Set<UserInfo> users) {
-        this.users = users;
-    }
-
-    public Role(Long id, String name, Set<UserInfo> users) {
+    public Role(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.users = users;
-    }
-
-    public Role() {
     }
 }
 

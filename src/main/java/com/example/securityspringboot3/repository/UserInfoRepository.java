@@ -2,6 +2,7 @@ package com.example.securityspringboot3.repository;
 
 import com.example.securityspringboot3.entity.Role;
 import com.example.securityspringboot3.entity.UserInfo;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
+@Transactional
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     Optional<UserInfo> findByUsername(String username);
 

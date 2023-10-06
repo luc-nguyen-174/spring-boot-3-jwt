@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UserInfoDetails implements UserDetails {
@@ -19,27 +18,10 @@ public class UserInfoDetails implements UserDetails {
     public UserInfoDetails(UserInfo userInfo) {
         username = userInfo.getUsername();
         password = userInfo.getPassword();
-        authorities = userInfo.getRoles().stream()
+        authorities = userInfo.getRoles()
+                .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
-    }
-
-    public UserInfoDetails(String username, String password, String email, List<GrantedAuthority> authorities) {
-        this.username = username;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-
-    public void setAuthorities(List<GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
-    public static UserInfoDetails build(UserInfo userInfo) {
-        List<GrantedAuthority> authorities = userInfo.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
-        return new UserInfoDetails(userInfo.getUsername(), userInfo.getPassword(), userInfo.getEmail(), authorities);
     }
 
     @Override
@@ -75,13 +57,5 @@ public class UserInfoDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

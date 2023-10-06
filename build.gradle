@@ -38,6 +38,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.8.1'
+
 
     //mail sender dependencies
     implementation 'org.springframework.boot:spring-boot-starter-mail'

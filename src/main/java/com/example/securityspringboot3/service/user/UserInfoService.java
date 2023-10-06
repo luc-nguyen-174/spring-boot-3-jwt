@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,7 +33,8 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserInfo> userDetail = userInfoRepository.findByUsername(username);
         // Converting userDetail to UserDetails
-        return userDetail.map(UserInfoDetails::build).orElse(null);
+        return userDetail.map(UserInfoDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public String addUser(UserDTO userDTO) {

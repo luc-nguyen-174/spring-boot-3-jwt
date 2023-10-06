@@ -58,8 +58,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/**",
                                 "/auth/get-all-user").permitAll()
-                        .requestMatchers("/auth/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/auth/admin/**").hasAnyRole("ADMIN"))
+                        .requestMatchers("/auth/user/**").authenticated()
+                        .requestMatchers("/auth/admin/**").authenticated())
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
