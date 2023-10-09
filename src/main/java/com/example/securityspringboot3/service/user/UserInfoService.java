@@ -1,23 +1,28 @@
 package com.example.securityspringboot3.service.user;
 
+import com.example.securityspringboot3.dto.response.JwtResponse;
 import com.example.securityspringboot3.dto.UserDTO;
+import com.example.securityspringboot3.dto.request.AuthRequest;
 import com.example.securityspringboot3.entity.ConfirmationToken;
 import com.example.securityspringboot3.entity.Role;
 import com.example.securityspringboot3.entity.UserInfo;
 import com.example.securityspringboot3.repository.ConfirmationTokenRepository;
 import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.email.EmailService;
+import com.example.securityspringboot3.service.jwt.JwtService;
 import com.example.securityspringboot3.service.role.IRoleService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +41,9 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private EmailService emailService;
@@ -106,7 +114,7 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
         //send email
         emailService.sendEmail(userInfo, confirmationToken.getConfirmationToken());
-        return "User Added Successfully";
+        return "User added successfully, please check your email to confirm your account";
     }
 
     @Override
@@ -142,9 +150,40 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
             UserInfo userInfo = userInfoRepository.findByEmailIgnoreCase(token.getUserInfo().getEmail());
             userInfo.setEnabled(true);
             userInfoRepository.save(userInfo);
-//            token.setConfirmationToken(null);
+            confirmationTokenRepository.delete(token);
             return ResponseEntity.ok("User confirmed successfully");
         }
-        return ResponseEntity.ok("User not enabled");
+        return ResponseEntity.ok("User or token not found");
     }
+
+    @Override
+    public Optional<UserInfo> findByName(String name) {
+        return userInfoRepository.findByName(name);
+    }
+
+    @Override
+    public ResponseEntity<?> login(AuthRequest authRequest, Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String accessToken = jwtService.generateToken(authRequest.getUsername());
+        //get user details
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //get user info
+        UserInfo userInfo = findByName(userDetails.getUsername()).get();
+        if (!userInfo.isEnabled()) {
+            return new ResponseEntity<>("User not enabled", HttpStatus.OK);
+        }
+        //return jwtResponse
+        JwtResponse jwtResponse = new JwtResponse();
+        jwtResponse.setId(userInfo.getId());
+        jwtResponse.setAccessToken(accessToken);
+        jwtResponse.setName(userInfo.getName());
+        jwtResponse.setEmail(userInfo.getEmail());
+        jwtResponse.setAuthorities(userDetails.getAuthorities());
+        return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
+    }
+
+//    @Override
+//    public ResponseEntity<?> logout(Authentication authentication, String token) {
+//        return null;
+//    }
 }

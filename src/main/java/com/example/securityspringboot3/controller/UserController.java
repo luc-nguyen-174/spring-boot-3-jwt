@@ -1,8 +1,9 @@
 package com.example.securityspringboot3.controller;
 
 import com.example.securityspringboot3.dto.UserDTO;
-import com.example.securityspringboot3.entity.AuthRequest;
+import com.example.securityspringboot3.dto.request.AuthRequest;
 import com.example.securityspringboot3.entity.UserInfo;
+import com.example.securityspringboot3.exception.InvalidCredentialsException;
 import com.example.securityspringboot3.service.jwt.JwtService;
 import com.example.securityspringboot3.service.user.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Tutorial", description = "Tutorial management APIs")
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
 
     @Autowired
@@ -58,7 +60,7 @@ public class UserController {
 
 
     /*----------------------  add new user  ---------------------*/
-    @PostMapping({"/"})
+    @PostMapping({"/register", "/addNewUser"})
     public String addNewUser(@RequestBody UserDTO userDTO) {
         return userInfoService.addUser(userDTO);
     }
@@ -84,7 +86,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/get-all-user")
+    @GetMapping("/admin/users")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Iterable<UserInfo>> getAllUser() {
         Iterable<UserInfo> userInfos = userInfoService.findAll();
@@ -103,4 +105,22 @@ public class UserController {
         }
     }
 
+    /*----------------------public api---------------------*/
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            if (authentication.isAuthenticated()) {
+                //login success
+                //return jwtResponse
+                return userInfoService.login(authRequest, authentication);
+            } else {
+                throw new UsernameNotFoundException("invalid user request !");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new InvalidCredentialsException("Username or password is incorrect"));
+        }
+    }
 }

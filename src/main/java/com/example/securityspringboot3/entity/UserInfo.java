@@ -1,6 +1,7 @@
 package com.example.securityspringboot3.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "user_info")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
 public class UserInfo implements Serializable {
 
     @Id

@@ -1,5 +1,6 @@
 package com.example.securityspringboot3.service.jwt;
 
+import com.example.securityspringboot3.entity.UserInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,6 +23,10 @@ public class JwtService {
 
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
+    // This is the expiration time of our token
+    // 30 minutes
+    public static final Long EXPIRATION_TIME = 1000 * 60 * 30L;
+
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userName);
@@ -32,28 +37,36 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 
+    // This method is used to generate the key
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // This method is used to validate the token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    // This method is used to validate the token
+    // This method is used to extract the expiration from the token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    // This method is used to validate the token
+    // This method is used to extract the claims from the token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    // This method is used to validate the token
+    // This method is used to extract the claims from the token
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()

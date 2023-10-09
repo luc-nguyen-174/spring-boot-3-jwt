@@ -1,4 +1,4 @@
-package com.example.securityspringboot3.entity;
+package com.example.securityspringboot3.dto.request;
 
 import lombok.*;
 
