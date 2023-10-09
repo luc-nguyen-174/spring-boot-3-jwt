@@ -4,6 +4,7 @@ import com.example.securityspringboot3.dto.response.JwtResponse;
 import com.example.securityspringboot3.dto.UserDTO;
 import com.example.securityspringboot3.dto.request.AuthRequest;
 import com.example.securityspringboot3.entity.ConfirmationToken;
+import com.example.securityspringboot3.entity.RefreshToken;
 import com.example.securityspringboot3.entity.Role;
 import com.example.securityspringboot3.entity.UserInfo;
 import com.example.securityspringboot3.repository.ConfirmationTokenRepository;
@@ -11,6 +12,7 @@ import com.example.securityspringboot3.repository.UserInfoRepository;
 import com.example.securityspringboot3.service.email.EmailService;
 import com.example.securityspringboot3.service.jwt.JwtService;
 import com.example.securityspringboot3.service.role.IRoleService;
+import com.example.securityspringboot3.service.token.IRefreshTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,9 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private IRefreshTokenService refreshTokenService;
 
     @Autowired
     private JwtService jwtService;
@@ -172,13 +177,16 @@ public class UserInfoService implements UserDetailsService, IUserInfoService {
         if (!userInfo.isEnabled()) {
             return new ResponseEntity<>("User not enabled", HttpStatus.OK);
         }
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userInfo.getId());
         //return jwtResponse
-        JwtResponse jwtResponse = new JwtResponse();
-        jwtResponse.setId(userInfo.getId());
-        jwtResponse.setAccessToken(accessToken);
-        jwtResponse.setName(userInfo.getName());
-        jwtResponse.setEmail(userInfo.getEmail());
-        jwtResponse.setAuthorities(userDetails.getAuthorities());
+        JwtResponse jwtResponse = new JwtResponse(
+                userInfo.getId(),
+                accessToken,
+                refreshToken.getToken(),
+                userInfo.getName(),
+                userInfo.getEmail(),
+                userDetails.getAuthorities());
+
         return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
     }
 

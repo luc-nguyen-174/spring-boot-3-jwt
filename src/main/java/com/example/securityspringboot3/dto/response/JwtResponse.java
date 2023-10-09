@@ -14,6 +14,7 @@ import java.util.Collection;
 public class JwtResponse {
     private Long id;
     private String accessToken;
+    private String refreshToken;
     private final String type = "Bearer";
     private String name;
     private String email;

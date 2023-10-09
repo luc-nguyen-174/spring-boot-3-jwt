@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.Serial;
 
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class InvalidCredentialsException extends Exception {
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class TokenRefreshException extends Exception {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public InvalidCredentialsException(String message) {
-        super(message);
+    public TokenRefreshException(String token, String message) {
+        super(String.format("Failed for [%s]: %s", token, message));
     }
 }

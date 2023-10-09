@@ -2,9 +2,13 @@ package com.example.securityspringboot3.controller;
 
 import com.example.securityspringboot3.dto.UserDTO;
 import com.example.securityspringboot3.dto.request.AuthRequest;
+import com.example.securityspringboot3.dto.request.TokenRefreshRequest;
+import com.example.securityspringboot3.entity.RefreshToken;
 import com.example.securityspringboot3.entity.UserInfo;
 import com.example.securityspringboot3.exception.InvalidCredentialsException;
+import com.example.securityspringboot3.exception.TokenRefreshException;
 import com.example.securityspringboot3.service.jwt.JwtService;
+import com.example.securityspringboot3.service.token.IRefreshTokenService;
 import com.example.securityspringboot3.service.user.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +41,9 @@ public class UserController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private IRefreshTokenService refreshTokenService;
 
     /*----------------------Swagger and test api---------------------*/
     @Operation(
@@ -122,5 +130,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new InvalidCredentialsException("Username or password is incorrect"));
         }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws TokenRefreshException {
+        String requestRefreshToken = request.getRefreshToken();
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(token1 -> {
+                    try {
+                        return refreshTokenService.verifyExpiration(token1);
+                    } catch (TokenRefreshException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtService.generateToken(user.getName());
+                    return ResponseEntity.ok(token);
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 }
